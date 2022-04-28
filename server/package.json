@@ -1,0 +1,19 @@
+{
+  "name": "extavalon",
+  "version": "1.0.0",
+  "description": "extavalon",
+  "main": "server.js",
+  "scripts": {
+    "devStart": "nodemon server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.0",
+    "express": "^4.17.3",
+    "nodemon": "^2.0.15",
+    "pg": "^8.7.3",
+    "socket.io": "^4.5.0"
+  }
+}

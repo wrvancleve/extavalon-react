@@ -1,0 +1,38 @@
+%future-color {
+  color: #9debfb;
+}
+
+%future-box {
+  border: 2px solid rgb(0, 248, 248);
+  box-shadow: 0 0 4px rgba(2,157,187,0.65);
+}
+
+%future-box-transparent {
+  @extend %future-box;
+  background-color: transparent;
+}
+
+%flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+body {
+  font-family: 'Helvetica', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  @extend %future-color;
+  background-image: url("../assets/images/background-large.jpg");
+}
+
+.FutureTitleBoxed {
+  text-align: center;
+  padding: 5vh 5vw;
+  margin: auto;
+  width: 80vw;
+  max-width: 300px;
+  font-size: 3em;
+  font-family: Candara, sans-serif;
+  text-shadow: 0 0 4px rgba(161,236,251,0.65);
+  @extend %future-box-transparent;
+}
