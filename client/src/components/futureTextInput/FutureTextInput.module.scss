@@ -1,0 +1,41 @@
+@import '../../styles/main';
+
+input:not([type=submit]).FutureInput {
+    font-size: 1.5em;
+    @extend %future-color;
+
+    box-sizing: border-box;
+    border-radius: 20vw;
+    @extend %future-box-transparent;
+    
+    outline: none;
+    padding: 0 20px;
+    width: 70vw;
+    max-width: 300px;
+    margin: auto;
+    display: inline-block;
+    align-items: flex-start;
+    text-align: start;
+
+    @media only screen and (max-height: 700px) {
+        height: 2.25em;
+        margin-top: 0.5em;
+    }
+    @media only screen and (min-height: 700px) {
+        height: 2.5em;
+        margin-top: 1em;
+    }
+}
+
+input:not([type=submit]).FutureInput::placeholder {
+    color: #08a5c4;
+    opacity: 1;
+}
+  
+input:not([type=submit]).FutureInput:-ms-input-placeholder {
+    color: #08a5c4;
+}
+  
+input:not([type=submit]).FutureInput::-ms-input-placeholder {
+    color: #08a5c4;
+}

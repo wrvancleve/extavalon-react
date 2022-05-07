@@ -1,0 +1,17 @@
+@import '../../styles/main';
+
+h1.FutureTitleBoxed {
+    text-align: center;
+    padding: 5vh 5vw;
+    margin: auto;
+    width: 80vw;
+    max-width: 300px;
+    font-size: 3em;
+    font-family: Candara, sans-serif;
+    text-shadow: 0 0 4px rgba(161,236,251,0.65);
+    @extend %future-box-transparent;
+}
+
+a.FutureLink { 
+    color: inherit;
+}

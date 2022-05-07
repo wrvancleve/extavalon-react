@@ -1,16 +1,21 @@
 const lobbyManager = require('./models/lobbyManager');
 const Game = require('./models/game');
 const OnlineGame = require('./models/onlineGame');
-const { choice } = require('../utils/random');
+const { choice } = require('./utils/random');
 const {
     createGame,
     insertSingleAssassination,
     insertPairedAssassination,
     insertGamePlayer
-} = require('./database');
+} = require('./services/database');
 
 function createGameSocket(httpServer) {
-    const io = require('socket.io')(httpServer);
+    const io = require('socket.io')(httpServer, {
+        cors: {
+            origin: "http://localhost:3000",
+            methods: ["GET", "POST"]
+        }
+    });
 
     function closeLobby(lobby) {
         const code = lobby.code;
@@ -27,9 +32,7 @@ function createGameSocket(httpServer) {
         }
     }, 600000);
 
-    function updatePlayer(lobby, socket) {
-        const userId = socket.handshake.query.userId;
-        const socketId = socket.id;
+    function updatePlayer(lobby, userId, socketId) {
         lobby.playerCollection.updatePlayer(userId, socketId, true);
 
         if (lobby.game) {
@@ -128,6 +131,7 @@ function createGameSocket(httpServer) {
     }
 
     function handleDisconnect(lobby, userId) {
+        console.log(`${userId} is disconnecting`);
         lobby.playerCollection.deactivatePlayer(userId);
         sendUpdatePlayers(lobby);
     }
@@ -471,95 +475,97 @@ function createGameSocket(httpServer) {
     }
 
     io.on('connection', socket => {
-        const code = socket.handshake.query.code;
-        const userId = socket.handshake.query.userId;
+        socket.on('join-game', (code, playerInformation) => {
+            const {userId} = playerInformation;
+            const lobby = lobbyManager.get(code);
+            if (lobby) {
+                lobby.updateTime = Date.now();
+                if (!lobby.playerCollection.doesUserIdExist(userId)) {
+                    lobby.playerCollection.addPlayer(playerInformation, socket.id);
+                } else {
+                    updatePlayer(lobby, userId, socket.id);
+                }
+                socket.join(code);
 
-        const lobby = lobbyManager.get(code);
-        if (lobby) {
-            lobby.updateTime = Date.now();
-            if (!lobby.playerCollection.doesUserIdExist(userId)) {
-                lobby.playerCollection.addPlayer(socket);
-            } else {
-                updatePlayer(lobby, socket);
-            }
-            socket.join(code);
-
-            sendUpdatePlayers(lobby);
-
-            socket.on('lobby:update-player-index', (playerIndexUpdateInformation) => {
-                lobby.playerCollection.handleUpdatePlayerIndex(playerIndexUpdateInformation);
                 sendUpdatePlayers(lobby);
-            });
 
-            socket.on('role:pick', (rolePickInformation) => {
-                lobby.updateTime = Date.now();
-                rolePickInformation.id = lobby.playerCollection.getPlayerIdOfUserId(userId);
-                handleRolePick(lobby, rolePickInformation);
-            });
+                socket.on('lobby:update-player-index', (playerIndexUpdateInformation) => {
+                    lobby.playerCollection.handleUpdatePlayerIndex(playerIndexUpdateInformation);
+                    sendUpdatePlayers(lobby);
+                });
 
-            socket.on('game:start', () => {
-                lobby.updateTime = Date.now();
-                handleStartGame(lobby);
-            });
+                socket.on('role:pick', (rolePickInformation) => {
+                    lobby.updateTime = Date.now();
+                    rolePickInformation.id = lobby.playerCollection.getPlayerIdOfUserId(userId);
+                    handleRolePick(lobby, rolePickInformation);
+                });
 
-            socket.on('proposal:update', (team) => {
-                lobby.updateTime = Date.now();
-                handleUpdateTeam(lobby, team);
-            });
+                socket.on('game:start', () => {
+                    lobby.updateTime = Date.now();
+                    handleStartGame(lobby);
+                });
 
-            socket.on('proposal:submit', (selectedIds) => {
-                lobby.updateTime = Date.now();
-                handleProposeTeam(lobby, selectedIds);
-            });
+                socket.on('proposal:update', (team) => {
+                    lobby.updateTime = Date.now();
+                    handleUpdateTeam(lobby, team);
+                });
 
-            socket.on('affect:toggle', (affectInformation) => {
-                lobby.updateTime = Date.now();
-                handleToggleAffect(lobby, userId, affectInformation);
-            });
+                socket.on('proposal:submit', (selectedIds) => {
+                    lobby.updateTime = Date.now();
+                    handleProposeTeam(lobby, selectedIds);
+                });
 
-            socket.on('proposal:vote', (vote) => {
-                lobby.updateTime = Date.now();
-                handleVoteTeam(lobby, userId, vote);
-            });
+                socket.on('affect:toggle', (affectInformation) => {
+                    lobby.updateTime = Date.now();
+                    handleToggleAffect(lobby, userId, affectInformation);
+                });
 
-            socket.on('mission:conduct', (action) => {
-                lobby.updateTime = Date.now();
-                handleConductMission(lobby, userId, action);
-            });
+                socket.on('proposal:vote', (vote) => {
+                    lobby.updateTime = Date.now();
+                    handleVoteTeam(lobby, userId, vote);
+                });
 
-            socket.on('mission:advance', () => {
-                lobby.updateTime = Date.now();
-                handleAdvanceMission(lobby);
-            });
+                socket.on('mission:conduct', (action) => {
+                    lobby.updateTime = Date.now();
+                    handleConductMission(lobby, userId, action);
+                });
 
-            socket.on('mission:results', (missionResultsInformation) => {
-                lobby.updateTime = Date.now();
-                handleMissionResults(lobby, missionResultsInformation);
-            });
+                socket.on('mission:advance', () => {
+                    lobby.updateTime = Date.now();
+                    handleAdvanceMission(lobby);
+                });
 
-            socket.on('redemption:conduct', (redemptionAttemptInformation) => {
-                lobby.updateTime = Date.now();
-                handleConductRedemption(lobby, redemptionAttemptInformation);
-            });
+                socket.on('mission:results', (missionResultsInformation) => {
+                    lobby.updateTime = Date.now();
+                    handleMissionResults(lobby, missionResultsInformation);
+                });
 
-            socket.on('assassination:conduct', (conductAssassinationInformation) => {
-                lobby.updateTime = Date.now();
-                handleConductAssassination(lobby, conductAssassinationInformation);
-            });
+                socket.on('redemption:conduct', (redemptionAttemptInformation) => {
+                    lobby.updateTime = Date.now();
+                    handleConductRedemption(lobby, redemptionAttemptInformation);
+                });
 
-            socket.on('lobby:kick-player', (playerId) => {
-                kickPlayer(lobby, playerId);
-            });
+                socket.on('assassination:conduct', (conductAssassinationInformation) => {
+                    lobby.updateTime = Date.now();
+                    handleConductAssassination(lobby, conductAssassinationInformation);
+                });
 
-            socket.on('lobby:close', () => {
-                closeLobby(lobby);
-            });
+                socket.on('lobby:kick-player', (playerId) => {
+                    kickPlayer(lobby, playerId);
+                });
 
-            socket.on('disconnect', () => {
-                lobby.updateTime = Date.now();
-                handleDisconnect(lobby, userId);
-            });
-        }
+                socket.on('lobby:close', () => {
+                    closeLobby(lobby);
+                });
+
+                socket.on('disconnect', () => {
+                    lobby.updateTime = Date.now();
+                    handleDisconnect(lobby, userId);
+                });
+            } else {
+                console.log("Game not found!");
+            }
+        });
     });
 };
 

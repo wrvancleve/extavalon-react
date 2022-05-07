@@ -9,8 +9,17 @@ const reducer = combineReducers({
 
 const sagaMiddleware = createSagaMiddleware();
 
+const preloadedState = {
+    userToken: {
+        firstName: localStorage.getItem('firstName') || undefined,
+        lastName: localStorage.getItem('lastName') || undefined,
+        userId: localStorage.getItem('userId') || undefined
+    }
+};
+
 const store = configureStore({
     reducer,
+    preloadedState,
     middleware: [...getDefaultMiddleware({thunk: false}), sagaMiddleware]
 });
 

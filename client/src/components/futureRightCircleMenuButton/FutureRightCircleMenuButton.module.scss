@@ -1,0 +1,22 @@
+@import '../../styles/main';
+
+button.FutureRightCircleMenuButton {
+    border-radius: 50%;
+    -webkit-border-radius: 50%;
+    width: 1.5em;
+    height: 1.5em;
+    font-size: 1.5em;
+    top: 10px;
+    right: 10px;
+    margin-top: 0px;
+    position: absolute;
+    z-index: 5;
+    cursor: pointer;
+    @extend %future-color;
+    @extend %future-box-transparent;
+    -webkit-appearance: none;
+}
+
+button.FutureRightCircleMenuButton img {
+    width: 0.75em;
+}

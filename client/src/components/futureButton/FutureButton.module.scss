@@ -1,0 +1,9 @@
+@import '../../styles/main';
+
+button.FutureButton {
+    @extend %future-button;
+}
+
+button.FutureButtonDisabled {
+    @extend %future-button-disabled;
+}

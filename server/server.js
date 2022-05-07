@@ -3,6 +3,8 @@ require('dotenv').config({ path: `${__dirname}/.env` });
 const express = require('express');
 const cors = require('cors');
 const http = require('http');
+const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
 
 const createGameSocket = require('./gameSocket');
 
@@ -18,7 +20,9 @@ app.use(cors({
     origin: "http://localhost:3000",
     optionsSuccessStatus: 200
 }));
-app.use(express.json());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser());
 
 app.use('/login', loginRouter);
 app.use('/game', gameRouter);

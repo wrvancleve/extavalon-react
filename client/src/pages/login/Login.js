@@ -1,12 +1,30 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import TextInput from '../../components/TextInput';
-import { getUserToken } from './redux/userToken/UserTokenSlice';
+import { useDispatch, useSelector } from 'react-redux';
+
+import FutureInputButton from '../../components/futureInputButton/FutureInputButton';
+import FutureTextInput from '../../components/futureTextInput/FutureTextInput';
+import FutureTitleBoxed from '../../components/futureTitleBoxed/FutureTitleBoxed';
+import { clearUserToken, getUserToken } from '../../redux/userToken/UserTokenSlice';
 
 export default function Login() {
     const navigate = useNavigate();
     const dispatch = useDispatch();
+
+    const userToken = useSelector((state) => state.userToken);
+
+    useEffect(() => {
+        localStorage.removeItem('firstName');
+        localStorage.removeItem('lastName');
+        localStorage.removeItem('userId');
+        dispatch(clearUserToken());
+    }, [dispatch]);
+
+    useEffect(() => {
+        if (userToken.firstName && userToken.lastName && userToken.userId) {
+            navigate("/");
+        }
+    }, [userToken]);
 
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
@@ -24,8 +42,8 @@ export default function Login() {
 
     function handleNameCheck() {
         const nameRegex = /^[a-z ,.'-]{2,16}$/i;
-        const firstNameCheck = firstNameInput.trim().match(nameRegex);
-        const lastNameCheck = lastNameInput.trim().match(nameRegex);
+        const firstNameCheck = firstName.trim().match(nameRegex);
+        const lastNameCheck = lastName.trim().match(nameRegex);
         setDisableSubmit(!firstNameCheck || !lastNameCheck);
     }
  
@@ -33,21 +51,16 @@ export default function Login() {
         e.preventDefault();
         if (!disableSubmit) {
             dispatch(getUserToken({firstName, lastName}));
-            navigate("/");
         }
     }
 
     return (
         <>
-            <form onSubmit={handleLoginSubmit}>
-                <TextInput className="FutureInput" onChange={handleFirstNameChange} placeholder="Enter First Name" maxlength="16" required={true} text={firstName} />
-                <TextInput className="FutureInput" onChange={handleLastNameChange} placeholder="Enter Last Name" maxlength="16" required={true} text={lastName} />
-                {disableSubmit
-                    ?
-                        <input className="FutureButton FutureButtonDisabled" type="submit" disabled>Submit</input>
-                    :
-                        <input className="FutureButton" type="submit">Submit</input>
-                }
+            <FutureTitleBoxed />
+            <form className="FutureForm" onSubmit={handleLoginSubmit}>
+                <FutureTextInput onChange={handleFirstNameChange} placeholder="Enter First Name" maxLength="16" required={true} text={firstName} />
+                <FutureTextInput onChange={handleLastNameChange} placeholder="Enter Last Name" maxLength="16" required={true} text={lastName} />
+                <FutureInputButton text="Submit" disabled={disableSubmit}/>
             </form>
         </>
     )

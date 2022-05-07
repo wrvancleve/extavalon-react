@@ -1,23 +1,41 @@
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 import Home from './pages/home/Home';
 import Login from './pages/login/Login';
 import Game from './pages/game/Game';
-import { useSelector } from 'react-redux';
 
 function App() {
   const userToken = useSelector((state) => state.userToken);
-
-  if (!userToken) {
-    return <Login />
+  let loggedOut = true;
+  if (userToken.firstName && userToken.lastName && userToken.userId) {
+    loggedOut = false;
   }
 
   return (
     <Routes>
-      <Route exact path="/" element={<Home />} />
+      <Route
+        exact path="/"
+        element={
+          loggedOut ? (
+            <Navigate to="/login" replace/>
+          ) : (
+            <Home />
+          )
+        }
+      />
       <Route exact path="/login" element={<Login />} />
-      <Route exact path="/game" element={<Game />} />
+      <Route
+        exact path="/game"
+        element={
+          loggedOut ? (
+            <Navigate to="/login" replace/>
+          ) : (
+            <Game />
+          )
+        }
+      />
     </Routes>
   );
 }

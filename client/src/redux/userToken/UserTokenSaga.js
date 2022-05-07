@@ -1,24 +1,21 @@
 import { call, put } from 'redux-saga/effects';
+
+import axios from 'axios';
+
 import { setUserToken } from './UserTokenSlice';
 
 function requestGetUserToken(userInformation) {
-    return fetch("http://localhost:5000/login", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(userInformation)
-    });
+    return axios.post("http://localhost:5000/login", userInformation);
 }
 
 export function* handleGetUserToken(action) {
     try {
-        const response = yield call(requestGetUserToken, action.payload);
-        const {data} = response;
-        yield put(setUserToken({...data}));
+        const {data} = yield call(requestGetUserToken, action.payload);
+        localStorage.setItem('firstName', data.firstName);
+        localStorage.setItem('lastName', data.lastName);
+        localStorage.setItem('userId', data.userId);
+        yield put(setUserToken(data));
     } catch (error) {
         console.log(error);
     }
 }
-
-

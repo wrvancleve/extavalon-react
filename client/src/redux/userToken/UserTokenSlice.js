@@ -2,14 +2,18 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const userTokenSlice = createSlice({
     name: "userToken",
-    initialState: {},
+    initialState: {
+        firstName: undefined,
+        lastName: undefined,
+        userId: undefined
+    },
     reducers: {
         getUserToken() {},
         setUserToken(state, action) {
             return {...state, ...action.payload};
         },
         clearUserToken(state) {
-            return {};
+            return {firstName: undefined, lastName: undefined, userId: undefined};
         }
     }
 });

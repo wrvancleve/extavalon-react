@@ -1,33 +1,36 @@
 const express = require('express');
 const router = express.Router();
+
 const authenticate = require('../middleware/authenticate');
+const { parseAuthorization } = require('../utils/authorization');
 const lobbyManager = require('../models/lobbyManager');
 
-router.get('/:code', function (req, res) {
+router.get('/:code', authenticate, function (req, res) {
     const code = req.params.code;
-
-    if (lobbyManager.has(code)) {
-        const lobby = lobbyManager.get(code);
-        const host = lobby.host === req.cookies.userId;
-        const lobbyFull = !lobby.playerCollection.doesUserIdExist(req.cookies.userId) && lobby.playerCollection.getPlayerCount() === 10;
+    const lobby = lobbyManager.get(code);
+    if (lobby) {
+        const authorization = parseAuthorization(req.headers);
+        const lobbyFull = !lobby.playerCollection.doesUserIdExist(authorization.userId) && lobby.playerCollection.getPlayerCount() === 10;
 
         if (lobbyFull) {
-            req.session.errors = [{ msg: "Game full!" }]
-            res.redirect(req.session.backURL);
+            res.status(409).json({
+                error: "Game Full!"
+            });
         } else {
-            if (lobby.type === 'online') {
-                res.render('gameOnline', { title: 'Extavalon: Online Game', code: code, host: host, settings: lobby.settings });
-            } else {
-                res.render('gameLocal', { title: 'Extavalon: Local Game', code: code, host: host, settings: lobby.settings });
-            }
+            res.json({
+                code: code,
+                host: lobby.host,
+                settings: lobby.settings
+            });
         }
     } else {
-        req.session.errors = [{ msg: "Game not found!" }]
-        res.redirect(req.session.backURL);
+        res.status(404).json({
+            error: "Game Not Found!"
+        });
     }
 });
 
-router.post('/', function (req, res) {
+router.post('/', authenticate, function (req, res) {
     // Rest authorization needed
     const type = req.body.type;
     const settings = {
@@ -43,8 +46,10 @@ router.post('/', function (req, res) {
         cerdic: type === 'online' && req.body.spybind === "on",
         sirrobin: type === 'online' && req.body.sirrobin === "on"
     };
-    const code = lobbyManager.create(req.cookies.userId, type, settings);
-    res.redirect(`/game?code=${code}`);
+    const code = lobbyManager.create(Number(req.cookies.userId), type, settings);
+    res.json({
+        code: code
+    });
 });
 
 module.exports = router;

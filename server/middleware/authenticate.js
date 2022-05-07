@@ -1,10 +1,9 @@
-function checkCookie(cookie) {
-    return cookie && (!cookie.expires || cookie.expires > Date.now())
-}
+const { parseAuthorization } = require('../utils/authorization');
 
 module.exports = function (req, res, next) {
-    if (!checkCookie(req.cookies.firstName) || !checkCookie(req.cookies.lastName) || !checkCookie(req.cookies.userId)) {
-        res.redirect(`/login`);
+    const authorization = parseAuthorization(req.headers);
+    if (!authorization.firstName || !authorization.lastName || !authorization.userId) {
+        res.status(401).json({error: "Not logged in!"});
     } else {
         return next();
     }

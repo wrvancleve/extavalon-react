@@ -1,0 +1,16 @@
+#HelpContent {
+    margin-top: calc(1em + 13px);
+    align-items: center;
+    color: #b6f0fc;
+    font-family: 'Helvetica', sans-serif;
+}
+
+#HelpContent ul {
+    @media only screen and (min-width: 640px) {
+        width: 50vw;
+    }
+}
+
+#HelpContent h1 {
+    margin-inline-start: 10px;
+}
