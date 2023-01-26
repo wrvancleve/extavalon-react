@@ -1,0 +1,87 @@
+@import '../../styles/main';
+
+div.FutureMenuModal {
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4);
+
+    @media only screen and (max-width: 640px) {
+        padding-top: 17.5vh;
+    }
+    @media only screen and (min-width: 640px) {
+        padding-top: 15%;
+    }
+}
+
+div.FutureMenuModalContent {
+    position: relative;
+    background-color: #001a1a !important;
+    margin: auto;
+    padding: 0;
+    -webkit-animation-name: animatetop;
+    -webkit-animation-duration: 0.4s;
+    animation-name: animatetop;
+    animation-duration: 0.4s;
+    @extend %future-color;
+    @extend %future-box;
+
+    @media only screen and (max-width: 640px) {
+        width: calc(70vw + 5em);
+        max-width: calc(300px + 5em);
+    }
+    @media only screen and (min-width: 640px) {
+        width: calc(300px + 5em);
+    }
+}
+
+div.FutureMenuModalBody {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    margin-bottom: 2.5em;
+    margin-top: 2.5em;
+}
+
+div.FutureMenuModalBody button {
+    margin-top: 0;
+}
+
+div.FutureMenuModalBody button + button {
+    margin-top: 1em;
+}
+
+@-webkit-keyframes animatetop {
+    from {top:-300px; opacity:0} 
+    to {top:0; opacity:1}
+}
+
+@keyframes animatetop {
+    from {top:-300px; opacity:0}
+    to {top:0; opacity:1}
+}
+
+button.FutureCloseModalButton {
+    @extend %future-color;
+    font-size: 1.75em;
+    font-weight: bold;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    margin-top: 8px;
+    margin-right: 10px;
+    background-color: transparent;
+    border: none;
+}
+  
+button.FutureCloseModalButton:hover,
+button.FutureCloseModalButton:focus {
+    text-decoration: none;
+    cursor: pointer;
+    color: #08a5c4;
+}

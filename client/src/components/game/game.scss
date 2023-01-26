@@ -1,0 +1,57 @@
+@import '../../styles/main';
+
+#GameContent section, #RoleContent section {
+    margin: 0.33em 0em;
+}
+  
+#GameContent p {
+    margin: 0px;
+}
+
+#RoleContent {
+    font-family: 'Helvetica', sans-serif;
+    align-items: center;
+    justify-content: center;
+    @extend %flex-column;
+    margin: auto;
+    text-align: center;
+    margin-top: calc(1.5em + 13px);
+}
+
+#RoleContent p {
+    margin-block-start: 0.33em;
+    margin-block-end: 0.33em;
+}
+
+.ListGroup {
+    list-style: none;
+    padding-inline-start: 0px;
+}
+
+.ListGroupItem {
+    @extend %list-group-item;
+}
+
+.ListGroupItem + .ListGroupItem {
+    margin-top: 0.5em;
+}
+
+.NameWrapper {
+    display: table-cell;
+    vertical-align: middle;
+    width: calc(70vw/2);
+    max-width: 160px;
+
+    p {
+        @media only screen and (max-height: 800px) {
+            margin-block-start: 0.75em !important;
+            margin-block-end: 0.75em !important;
+            line-height: 1;
+        }
+        @media only screen and (min-height: 800px) {
+            margin-block-start: 1em !important;
+            margin-block-end: 1em !important;
+            line-height: 1;
+        }
+    }
+}

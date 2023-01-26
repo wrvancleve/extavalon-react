@@ -6,7 +6,7 @@ const http = require('http');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 
-const createGameSocket = require('./gameSocket');
+const attachServerSocket = require('./serverSocket');
 
 const loginRouter = require('./routes/login');
 const gameRouter = require('./routes/game');
@@ -14,7 +14,7 @@ const gameRouter = require('./routes/game');
 const app = express();
 
 const server = http.createServer(app);
-createGameSocket(server);
+attachServerSocket(server);
 
 app.use(cors({
     origin: "http://localhost:3000",

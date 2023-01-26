@@ -24,6 +24,15 @@ module.exports.choice = (array) => {
     return array[Math.floor(Math.random() * array.length)];
 }
 
+module.exports.lruChoice = (usageGroups, weight=3) => {
+    const usageGroupLists = Array.from(usageGroups.keys());
+    usageGroupLists.sort(function(a, b) {
+        return a - b;
+    })
+    const selectedUsageGroup = usageGroupLists[Math.floor(usageGroupLists.length * Math.pow(Math.random(), weight))];
+    return choice(usageGroups.get(selectedUsageGroup));
+}
+
 module.exports.nextBoolean = () => {
     return Math.random() < 0.5;
 }

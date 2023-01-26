@@ -279,7 +279,7 @@ function getPlayerAssassinatedStats(callback) {
     performTableQuery(playerAssassinatedStatsQuery, callback);
 }
 
-async function createGame(gameStartTime, gameResult) {
+async function createGameResult(gameStartTime, gameResult) {
     const createGameQuery = `
       select create_game('${gameStartTime.toISOString()}',
                          '${new Date(Date.now()).toISOString()}',
@@ -328,7 +328,7 @@ module.exports = {
     getRolePlayerStats,
     getPlayerAssassinationStats,
     getPlayerAssassinatedStats,
-    createGame,
+    createGameResult,
     insertSingleAssassination,
     insertPairedAssassination,
     insertGamePlayer

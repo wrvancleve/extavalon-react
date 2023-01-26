@@ -1,10 +1,10 @@
 import React from 'react';
 
-import FutureButton from '../futureButton/FutureButton';
-import FutureHeader from '../futureHeader/FutureHeader';
-import LobbyPlayers from '../lobbyPlayers/LobbyPlayers';
+import FutureButton from '../common/futureButton/FutureButton';
+import FutureHeader from '../common/futureHeader/FutureHeader';
+import LobbyPlayers from './lobbyPlayers/LobbyPlayers';
 
-import './Lobby.module.scss';
+import './lobby.scss';
 
 export default function Lobby({gameCode, isHost, players, handleRemovePlayerClick, handleStartGameButtonClick, handleCloseLobbyButtonClick}) {
     return (
@@ -13,7 +13,7 @@ export default function Lobby({gameCode, isHost, players, handleRemovePlayerClic
             <LobbyPlayers isHost={isHost} players={players} handleRemovePlayerClick={handleRemovePlayerClick} />
             {isHost &&
                 <>
-                    <FutureButton onClick={handleStartGameButtonClick} disabled={gamePlayers.length < 5} text="Start Game" />
+                    <FutureButton onClick={handleStartGameButtonClick} disabled={players.length < 5} text="New Game" />
                     <FutureButton onClick={handleCloseLobbyButtonClick} disabled={false} text="Close Lobby" />
                 </>
             }

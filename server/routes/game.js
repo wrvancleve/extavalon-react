@@ -5,8 +5,8 @@ const authenticate = require('../middleware/authenticate');
 const { parseAuthorization } = require('../utils/authorization');
 const lobbyManager = require('../models/lobbyManager');
 
-router.get('/:code', authenticate, function (req, res) {
-    const code = req.params.code;
+router.get('/', authenticate, function (req, res) {
+    const code = req.query.code;
     const lobby = lobbyManager.get(code);
     if (lobby) {
         const authorization = parseAuthorization(req.headers);
@@ -17,9 +17,10 @@ router.get('/:code', authenticate, function (req, res) {
                 error: "Game Full!"
             });
         } else {
-            res.json({
+            res.status(200).json({
                 code: code,
                 host: lobby.host,
+                type: lobby.type,
                 settings: lobby.settings
             });
         }
@@ -31,7 +32,7 @@ router.get('/:code', authenticate, function (req, res) {
 });
 
 router.post('/', authenticate, function (req, res) {
-    // Rest authorization needed
+    const authorization = parseAuthorization(req.headers);
     const type = req.body.type;
     const settings = {
         ector: req.body.ector === "on",
@@ -46,7 +47,7 @@ router.post('/', authenticate, function (req, res) {
         cerdic: type === 'online' && req.body.spybind === "on",
         sirrobin: type === 'online' && req.body.sirrobin === "on"
     };
-    const code = lobbyManager.create(Number(req.cookies.userId), type, settings);
+    const code = lobbyManager.create(Number(authorization.userId), type, settings);
     res.json({
         code: code
     });

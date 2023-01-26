@@ -2,9 +2,9 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
-import Home from './pages/home/Home';
-import Login from './pages/login/Login';
-import Game from './pages/game/Game';
+import Home from './components/home/Home';
+import Login from './components/login/Login';
+import Game from './components/game/Game';
 
 function App() {
   const userToken = useSelector((state) => state.userToken);

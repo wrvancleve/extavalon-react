@@ -118,10 +118,27 @@ label.FutureLabel {
   font-weight: 700;
 }
 
+.Clickable {
+  cursor: pointer;
+}
+
 .Resistance {
   color: #1e90ff;
 }
 
 .Spy {
   color: #FF3333;
+}
+
+%list-group-item {
+  border: 1px solid rgb(0, 248, 248);
+  border-radius: 10px;
+  /*
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  */
+  display: table;
+  width: 70vw;
+  max-width: 320px;
 }
