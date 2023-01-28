@@ -16,8 +16,10 @@ const app = express();
 const server = http.createServer(app);
 attachServerSocket(server);
 
+//const ROOT_URL = "http://localhost:80"
+const ROOT_URL = "https://www.extavalon.com:80"
 app.use(cors({
-    origin: "http://localhost:80",
+    origin: ROOT_URL,
     optionsSuccessStatus: 200
 }));
 app.use(bodyParser.json());

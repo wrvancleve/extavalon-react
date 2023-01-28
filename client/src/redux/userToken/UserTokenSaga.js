@@ -4,8 +4,10 @@ import axios from 'axios';
 
 import { setUserToken } from './UserTokenSlice';
 
+const ROOT_URL = "https://www.extavalon.com:5000";
+
 function requestGetUserToken(userInformation) {
-    return axios.post("http://localhost:5000/api/login", userInformation);
+    return axios.post(`${ROOT_URL}/api/login`, userInformation);
 }
 
 export function* handleGetUserToken(action) {

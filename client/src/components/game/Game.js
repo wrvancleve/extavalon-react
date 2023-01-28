@@ -20,7 +20,8 @@ import RolePick from './rolePick/RolePick';
 
 import './game.scss';
 
-const ROOT_URL = "http://localhost:5000";
+//const ROOT_URL = "http://localhost:5000";
+const ROOT_URL = "https://www.extavalon.com:5000";
 
 /*
 let location = useLocation();
@@ -123,7 +124,7 @@ export default function Game() {
         const authorization = "Basic " + btoa(userToken.firstName+":"+userToken.lastName+":"+userToken.userId);
         axios.request({
             method: "get",
-            url: "http://localhost:5000/api/game",
+            url: `${ROOT_URL}/api/game`,
             headers: {
                 "Content-Type": "application/json",
                 "Authorization": authorization
