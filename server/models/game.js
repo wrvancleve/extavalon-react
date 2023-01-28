@@ -345,13 +345,12 @@ Game.prototype._performAccolonSabotage = function() {
     if (target.role === Roles.Arthur) {
         const possibleIndexes = [];
         for (let i = 0; i < intel.length; i++) {
-            if (intel[i] !== Roles.Tristan.name && Roles.Iseult.name) {
+            if (intel[i] !== Roles.Tristan.name && intel[i] !== Roles.Iseult.name) {
                 possibleIndexes.push(i);
             }
         }
         const randomIndex = choice(possibleIndexes);
         intel[randomIndex] = null;
-        target.performSabotage(intel);
     } else if (target.role === Roles.Bedivere) {
         const possibleIndexes = [];
         for (let i = 0; i < intel.length; i++) {
@@ -361,31 +360,8 @@ Game.prototype._performAccolonSabotage = function() {
         }
         const randomIndex = choice(possibleIndexes);
         intel[randomIndex] = null;
-        target.performSabotage(intel);
     } else if (target.role === Roles.Lamorak) {
-        const insertIntoSameTeam = nextBoolean();
-        let isFirstPairSameTeam = false;
-        let firstPairTeam = null;
-        for (const player in intel[0]) {
-            if (firstPairTeam === null) {
-                firstPairTeam = player.team;
-            } else {
-                isFirstPairSameTeam = player.team === firstPairTeam;
-            }
-        }
-        if (insertIntoSameTeam) {
-            if (isFirstPairSameTeam) {
-                intel[0][choice([0, 1])] = target.getPlayerInformation();
-            } else {
-                intel[1][choice([0, 1])] = target.getPlayerInformation();
-            }
-        } else {
-            if (isFirstPairSameTeam) {
-                intel[1][choice([0, 1])] = target.getPlayerInformation();
-            } else {
-                intel[0][choice([0, 1])] = target.getPlayerInformation();
-            }
-        }
+        intel = this._performAccolonSabotageOnLamorak(intel, target.getPlayerInformation());
     } else {
         let insertPlayer = null;
         switch (target.role) {
@@ -425,8 +401,38 @@ Game.prototype._performAccolonSabotage = function() {
         }
         intel.push(insertPlayer);
         intel = shuffle(intel);
-        target.performSabotage(intel);
     }
+
+    target.performSabotage(intel);
+}
+
+Game.prototype._performAccolonSabotageOnLamorak = function (intel, targetPlayerInformation) {
+    const possibleInjections = [];
+    let pairNumberToInjectInto = undefined;
+    for (let i = 0; i < intel.length; i++) {
+        const pair = intel[i];
+        const pairPossibleInjections = [];
+        for (let j = 0; j < pair.length; j++) {
+            const player = pair[j];
+            if (player.team === "Resistance") {
+                pairPossibleInjections.push(j);
+            }
+        }
+        if (pairPossibleInjections.length === 0) {
+            pairNumberToInjectInto = i === 0 ? 1 : 0;
+        }
+        possibleInjections.push(pairPossibleInjections);
+    }
+    if (pairNumberToInjectInto === undefined) {
+        pairNumberToInjectInto = choice([0, 1]);
+    }
+
+    if (possibleInjections[pairNumberToInjectInto].length === 1) {
+        intel[pairNumberToInjectInto][possibleInjections[pairNumberToInjectInto][0]] = targetPlayerInformation;
+    } else {
+        intel[pairNumberToInjectInto][choice(possibleInjections[pairNumberToInjectInto])] = targetPlayerInformation;
+    }
+    return intel;
 }
 
 Game.prototype._performTitaniaSabotage = function() {

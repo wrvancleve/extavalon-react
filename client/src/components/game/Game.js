@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { createSearchParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useSelector } from 'react-redux';
 
@@ -12,6 +12,7 @@ import FutureMenuModal from '../common/futureMenuModal/FutureMenuModal';
 import FutureHeader from '../common/futureHeader/FutureHeader';
 import Lobby from '../lobby/Lobby';
 import Help from '../help/RoleHelp';
+import Local from './local/Local';
 import ConductRedemption from './conductRedemption/ConductRedemption';
 import ConductAssassination from './conductAssassination/ConductAssassination';
 import Result from './result/Result';
@@ -32,11 +33,7 @@ const socket = io.connect("http://localhost:5000")
 export default function Game() {
     const navigate = useNavigate();
 
-    let socket = null;
-
     const userToken = useSelector((state) => state.userToken);
-
-    console.log("userToken: %j", userToken);
 
     const [searchParams] = useSearchParams();
     const gameCode = searchParams.get('code');
@@ -44,6 +41,11 @@ export default function Game() {
     const [isHost, setIsHost] = useState(undefined);
     const [gameType, setGameType] = useState(undefined);
     const [gameSettings, setGameSettings] = useState(undefined);
+
+    const isHostRef = useRef(undefined);
+    isHostRef.current = isHost;
+    const gameTypeRef = useRef();
+    gameTypeRef.current = gameType;
 
     const [currentWindowName, setCurrentWindowName] = useState("Lobby");
     const [currentPrimaryWindowName, setCurrentPrimaryWindowName] = useState("Lobby");
@@ -58,13 +60,70 @@ export default function Game() {
     const [roleContent, setRoleContent] = useState(null);
     const [gameContent, setGameContent] = useState(null);
 
+    const gameSocketRef = useRef(null);
+
+    function handleBackButtonClick() {
+        setCurrentWindowName(currentPrimaryWindowName);
+    }
+
+    function handleMenuButtonClick() {
+        setIsMenuModalOpened(true);
+    }
+
+    function handleViewHelpClick() {
+        setIsMenuModalOpened(false);
+        setCurrentWindowName("Help");
+    }
+
+    function handleViewLobbyClick() {
+        setIsMenuModalOpened(false);
+        setCurrentWindowName("Lobby");
+    }
+
+    function handleViewRoleClick() {
+        setIsMenuModalOpened(false);
+        setCurrentWindowName("Role");
+    }
+
+    function handleViewGameClick() {
+        setIsMenuModalOpened(false);
+        setCurrentWindowName("Game");
+    }
+
+    function handleRemovePlayerClick(playerIndex) {
+        gameSocketRef.current.emit('lobby:kick-player', playerIndex);
+    }
+
+    function handleStartGameButtonClick() {
+        gameSocketRef.current.emit('game:start');
+    }
+
+    function handleCloseLobbyButtonClick() {
+        gameSocketRef.current.emit('lobby:close');
+    }
+
+    function handleRolePickSubmit(rolePickInformation) {
+        gameSocketRef.current.emit('role:pick', rolePickInformation);
+    }
+
+    function handleResultSubmit(currentMissionResults) {
+        gameSocketRef.current.emit('mission:results', currentMissionResults);
+    }
+
+    function handleConductRedemptionSubmit(conductRedemptionInformation) {
+        gameSocketRef.current.emit('redemption:conduct', conductRedemptionInformation);
+    }
+
+    function handleConductAssassinationSubmit(conductAssassinationInformation) {
+        gameSocketRef.current.emit('assassination:conduct', conductAssassinationInformation);
+    }
+
     useEffect(() => {
-        console.log("Inside initial setup");
 
         const authorization = "Basic " + btoa(userToken.firstName+":"+userToken.lastName+":"+userToken.userId);
         axios.request({
             method: "get",
-            url: "http://localhost:5000/game",
+            url: "http://localhost:5000/api/game",
             headers: {
                 "Content-Type": "application/json",
                 "Authorization": authorization
@@ -74,18 +133,19 @@ export default function Game() {
             }
         }).then(response => {
             setIsHost(response.data.host === userToken.userId);
+            
             setGameType(response.data.type);
             setGameSettings(response.data.settings);
 
-            socket = io.connect(`${ROOT_URL}?code=${gameCode}&userId=${userToken.userId}&firstName=${userToken.firstName}&lastName=${userToken.lastName}`);
+            const socket = io.connect(`${ROOT_URL}?code=${gameCode}&userId=${userToken.userId}&firstName=${userToken.firstName}&lastName=${userToken.lastName}`);
 
             socket.on('lobby:update-players', (lobbyPlayers) => {
                 setGamePlayers(lobbyPlayers);
             });
 
             socket.on('lobby:close', () => {
-                if (isHost) {
-                    if (gameType === 'online') {
+                if (isHostRef.current) {
+                    if (gameTypeRef.current === 'online') {
                         navigate({
                             pathname: "/",
                             search: createSearchParams({menu: 'newOnline'}).toString()
@@ -109,6 +169,7 @@ export default function Game() {
                     <RolePick/>
                 );
                 setCurrentPrimaryWindowName("Game");
+                setCurrentWindowName("Game");
             });
 
             socket.on('role:pick', ({possibleResistanceRoles, possibleSpyRoles}) => {
@@ -116,13 +177,15 @@ export default function Game() {
                     <RolePick possibleResistanceRoles={possibleResistanceRoles} possibleSpyRoles={possibleSpyRoles} handleRolePickSubmit={handleRolePickSubmit}/>
                 );
                 setCurrentPrimaryWindowName("Game");
+                setCurrentWindowName("Game");
             });
 
             socket.on('role:assign', (roleHTML) => {
+                setGameContent(null);
                 setRoleContent(roleHTML);
-                if (gameType === "local") {
-                    setCurrentWindowName("Role");
+                if (gameTypeRef.current === "local") {
                     setCurrentPrimaryWindowName("Role");
+                    setCurrentWindowName("Role");
                 }
             });
 
@@ -138,6 +201,7 @@ export default function Game() {
                     <ConductRedemption conductRedemptionInformation={conductRedemptionInformation} handleConductRedemptionSubmit={handleConductRedemptionSubmit}/>
                 );
                 setCurrentPrimaryWindowName("Game");
+                setCurrentWindowName("Game");
             });
 
             socket.on('assassination:conduct', (conductAssassinationInformation) => {
@@ -145,6 +209,7 @@ export default function Game() {
                     <ConductAssassination conductAssassinationInformation={conductAssassinationInformation} handleConductAssassinationSubmit={handleConductAssassinationSubmit}/>
                 );
                 setCurrentPrimaryWindowName("Game");
+                setCurrentWindowName("Game");
             });
 
             socket.on('game:result', (gameResultInformation) => {
@@ -152,9 +217,20 @@ export default function Game() {
                     <Result gameResultInformation={gameResultInformation}/>
                 );
                 setCurrentPrimaryWindowName("Game");
+                setCurrentWindowName("Game");
             });
+
+            gameSocketRef.current = socket;
         }).catch(error => {
-            navigate("/", { state: { errors: error.response.data.error } });
+            navigate(
+                {
+                    pathname: "/",
+                    search: createSearchParams({menu: 'join'}).toString()                
+                },
+                {
+                    state: { errors: [error.response.data.error] }
+                }
+            );
         });
     }, []);
 
@@ -197,62 +273,6 @@ export default function Game() {
         }
     }, [currentPrimaryWindowName]);
 
-    function handleBackButtonClick() {
-        setCurrentWindowName(currentPrimaryWindowName);
-    }
-
-    function handleMenuButtonClick() {
-        setIsMenuModalOpened(true);
-    }
-
-    function handleViewHelpClick() {
-        setIsMenuModalOpened(false);
-        setCurrentWindowName("Help");
-    }
-
-    function handleViewLobbyClick() {
-        setIsMenuModalOpened(false);
-        setCurrentWindowName("Lobby");
-    }
-
-    function handleViewRoleClick() {
-        setIsMenuModalOpened(false);
-        setCurrentWindowName("Role");
-    }
-
-    function handleViewGameClick() {
-        setIsMenuModalOpened(false);
-        setCurrentWindowName("Game");
-    }
-
-    function handleRemovePlayerClick(playerIndex) {
-        socket.emit('lobby:kick-player', playerIndex);
-    }
-
-    function handleStartGameButtonClick() {
-        socket.emit('game:start');
-    }
-
-    function handleCloseLobbyButtonClick() {
-        socket.emit('lobby:close');
-    }
-
-    function handleRolePickSubmit(rolePickInformation) {
-        socket.emit('role:pick', rolePickInformation);
-    }
-
-    function handleResultSubmit(currentMissionResults) {
-        socket.emit('mission:results', currentMissionResults);
-    }
-
-    function handleConductRedemptionSubmit(conductRedemptionInformation) {
-        socket.emit('redemption:conduct', conductRedemptionInformation);
-    }
-
-    function handleConductAssassinationSubmit(conductAssassinationInformation) {
-        socket.emit('assassination:conduct', conductAssassinationInformation);
-    }
-
     switch (currentWindowName) {
         case "Help":
             return (
@@ -283,9 +303,9 @@ export default function Game() {
                             viewRoleText={viewRoleText} handleViewGameClick={handleViewGameClick} viewGameText={viewGameText}
                         />
                     }
-                    <div className="CenterFlexColumn" id="RoleContent">
-                        {roleContent}
-                    </div>
+                    {roleContent != null &&
+                        <div className="CenterFlexColumn" id="RoleContent" dangerouslySetInnerHTML={{ __html: roleContent }} />
+                    }
                 </>
             );
         case "Game":

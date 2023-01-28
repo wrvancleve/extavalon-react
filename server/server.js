@@ -17,15 +17,15 @@ const server = http.createServer(app);
 attachServerSocket(server);
 
 app.use(cors({
-    origin: "http://localhost:3000",
+    origin: "http://localhost:80",
     optionsSuccessStatus: 200
 }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-app.use('/login', loginRouter);
-app.use('/game', gameRouter);
+app.use('/api/login', loginRouter);
+app.use('/api/game', gameRouter);
 
 server.listen(process.env.PORT || 5000);
 

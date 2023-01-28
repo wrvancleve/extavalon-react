@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState, useEffect } from 'react';
 
 import FutureButton from '../../common/futureButton/FutureButton';
 import FutureHeader from '../../common/futureHeader/FutureHeader';
@@ -9,21 +9,15 @@ export default function Local({firstLeaderName, handleResultSubmit}) {
 
     useEffect(() => {
         setSubmitDisabled(getMissionsWinner() === null);
-        if (getMissionsWinner() !== null) {
-
-            submitMissionResultsButton.onclick = function () {
-                socket.emit('mission:results', currentMissionResults);
-            };
-            setButtonDisabled(submitMissionResultsButton, false);
-        } else {
-            submitMissionResultsButton.removeAttribute("onclick");
-            setButtonDisabled(submitMissionResultsButton, true);
-        }
     }, [currentMissionResults]);
 
     function handleMissionResultChange(mission, result) {
         const newMissionResults = [...currentMissionResults];
-        newMissionResults[mission] = result;
+        if (result !== "none") {
+            newMissionResults[mission] = result;
+        } else {
+            newMissionResults[mission] = null;
+        }
         setCurrentMissionResults(newMissionResults);
     }
 
@@ -61,7 +55,7 @@ export default function Local({firstLeaderName, handleResultSubmit}) {
             <div className="CenterFlexRow">
                 <label for="MissionOneResultSelect">Mission 1 Winner:</label>
                 <select id="MissionOneResultSelect" onChange={(e) => handleMissionResultChange(0, e.target.value)}>
-                    <option value="none" disabled />
+                    <option value="none" selected disabled />
                     <option value="Resistance">Resistance</option>
                     <option value="Spies">Spies</option>
                 </select>
@@ -69,7 +63,7 @@ export default function Local({firstLeaderName, handleResultSubmit}) {
             <div className="CenterFlexRow">
                 <label for="MissionTwoResultSelect">Mission 2 Winner:</label>
                 <select id="MissionTwoResultSelect" onChange={(e) => handleMissionResultChange(1, e.target.value)}>
-                    <option value="none" disabled />
+                    <option value="none" selected disabled />
                     <option value="Resistance">Resistance</option>
                     <option value="Spies">Spies</option>
                 </select>
@@ -77,7 +71,7 @@ export default function Local({firstLeaderName, handleResultSubmit}) {
             <div className="CenterFlexRow">
                 <label for="MissionThreeResultSelect">Mission 3 Winner:</label>
                 <select id="MissionThreeResultSelect" onChange={(e) => handleMissionResultChange(2, e.target.value)}>
-                    <option value="none" disabled />
+                    <option value="none" selected disabled />
                     <option value="Resistance">Resistance</option>
                     <option value="Spies">Spies</option>
                 </select>
@@ -85,7 +79,7 @@ export default function Local({firstLeaderName, handleResultSubmit}) {
             <div className="CenterFlexRow">
                 <label for="MissionFourResultSelect">Mission 4 Winner:</label>
                 <select id="MissionFourResultSelect" onChange={(e) => handleMissionResultChange(3, e.target.value)}>
-                    <option value="none" />
+                    <option value="none" selected />
                     <option value="Resistance">Resistance</option>
                     <option value="Spies">Spies</option>
                 </select>
@@ -93,7 +87,7 @@ export default function Local({firstLeaderName, handleResultSubmit}) {
             <div className="CenterFlexRow">
                 <label for="MissionFiveResultSelect">Mission 5 Winner:</label>
                 <select id="MissionFiveResultSelect" onChange={(e) => handleMissionResultChange(4, e.target.value)}>
-                    <option value="none" />
+                    <option value="none" selected />
                     <option value="Resistance">Resistance</option>
                     <option value="Spies">Spies</option>
                 </select>

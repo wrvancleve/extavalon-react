@@ -5,7 +5,7 @@ import axios from 'axios';
 import { setUserToken } from './UserTokenSlice';
 
 function requestGetUserToken(userInformation) {
-    return axios.post("http://localhost:5000/login", userInformation);
+    return axios.post("http://localhost:5000/api/login", userInformation);
 }
 
 export function* handleGetUserToken(action) {

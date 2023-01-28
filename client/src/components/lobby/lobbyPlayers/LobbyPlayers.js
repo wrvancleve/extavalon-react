@@ -1,6 +1,6 @@
 import React from 'react';
 
-import FutureHeader from '../futureHeader/FutureHeader';
+import FutureHeader from '../../common/futureHeader/FutureHeader';
 
 import styles from './LobbyPlayers.module.scss';
 

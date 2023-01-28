@@ -5,9 +5,9 @@ import FutureHeader from '../../common/futureHeader/FutureHeader';
 export default function Result({gameResultInformation}) {
     const winner = gameResultInformation.winner;
     const assassination = gameResultInformation.assassination;
-    const assassinName = assassination.assassin.name;
-    const assassinationTargetRole = assassination.role;
-    const assassinationTargets = assassination.targets ?? [];
+    const assassinName = assassination != undefined ? assassination.assassin.name : null;
+    const assassinationTargetRole = assassination != undefined ? assassination.role : null;
+    const assassinationTargets = assassination != undefined ? assassination.targets ?? [] : null;
     const jester = gameResultInformation.jester;
     const puck = gameResultInformation.puck;
 
@@ -32,7 +32,10 @@ export default function Result({gameResultInformation}) {
             <FutureHeader headerType="h2" text={<><span class="Spy">Spies</span> win!</>} />
             <section>
                 <p>
-                    <span className="Spy">{assassinName}</span> correctly assassinated {assassinationTargets.map(target => `<span class="Resistance">${target.name}</span>`).join(' and ')} as <span className="Resistance">{assassinationTargetRole}</span>.
+                    <span className="Spy">{assassinName}</span> correctly assassinated {assassinationTargets
+                        .map(target => <span class="Resistance">{target.name}</span>)
+                        .reduce((prev, curr) => [prev, ' and ', curr])
+                    } as <span className="Resistance">{assassinationTargetRole}</span>.
                 </p>
             </section>
         </>
@@ -45,7 +48,7 @@ export default function Result({gameResultInformation}) {
         if (puck) {
             if (puck.won) {
                 winnerDescriptor = <>
-                    <span class="Resistance">Resistance</span> (including <span class="Resistance">${puck.name}</span> as <span class="Resistance">Puck</span>)
+                    <span class="Resistance">Resistance</span> (including <span class="Resistance">{puck.name}</span> as <span class="Resistance">Puck</span>)
                 </>;
             } else {
                 loserDescriptor = <p>
@@ -55,7 +58,7 @@ export default function Result({gameResultInformation}) {
         }
         if (jester) {
             loserDescriptor = <p>
-                <span class="Resistance">${jester.name}</span> failed to get assassinated and has lost as <span class="Resistance">Jester</span>!
+                <span class="Resistance">{jester.name}</span> failed to get assassinated and has lost as <span class="Resistance">Jester</span>!
             </p>;
         }
 
@@ -63,7 +66,10 @@ export default function Result({gameResultInformation}) {
             <FutureHeader headerType="h2" text={<>{winnerDescriptor} wins!</>} />
             <section>
                 <p>
-                    <span class="Spy">{assassinName}</span> incorrectly assassinated {assassinationTargets.map(target => `<span class="Resistance">${target.name}</span>`).join(' and ')} as <span class="Resistance">${assassinationTargetRole}</span>.
+                    <span class="Spy">{assassinName}</span> incorrectly assassinated {assassinationTargets
+                        .map(target => <span class="Resistance">{target.name}</span>)
+                        .reduce((prev, curr) => [prev, ' and ', curr])
+                    } as <span class="Resistance">{assassinationTargetRole}</span>.
                 </p>
                 {loserDescriptor &&
                     loserDescriptor
@@ -77,9 +83,12 @@ export default function Result({gameResultInformation}) {
             <FutureHeader headerType="h2" text={`${jester.name} wins!`} />
             <section>
                 <p>
-                    <span class="Spy">{assassinName}</span> attempted to assassinate {assassinationTargets.map(target => `<span class="Resistance">${target.name}</span>`).join(' and ')} as <span class="Resistance">${assassinationTargetRole}</span>.
+                    <span class="Spy">{assassinName}</span> attempted to assassinate {assassinationTargets
+                        .map(target => <span class="Resistance">{target.name}</span>)
+                        .reduce((prev, curr) => [prev, ' and ', curr])
+                    } as <span class="Resistance">{assassinationTargetRole}</span>.
                 </p>
-                <p>However, <span class="Resistance">${jester.name}</span> was the <span class="Resistance">Jester</span>!</p>
+                <p>However, <span class="Resistance">{jester.name}</span> was the <span class="Resistance">Jester</span>!</p>
             </section>
         </>
     }

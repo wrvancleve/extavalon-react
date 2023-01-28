@@ -1,10 +1,9 @@
 const lobbyManager = require('./models/lobbyManager');
-const { choice } = require('./utils/random');
 
 function attachServerSocket(httpServer) {
     const io = require('socket.io')(httpServer, {
         cors: {
-            origin: "http://localhost:3000",
+            origin: "http://localhost:80",
             methods: ["GET", "POST"]
         }
     });
@@ -21,103 +20,7 @@ function attachServerSocket(httpServer) {
                 closeLobby(lobby.code);
             }
         }
-    }, 600000);    
-
-    function handleStartGame(lobby) {
-        const players = lobby.playerCollection.getPlayers();
-        if (!lobby.currentStartingPlayerInformation) {
-            lobby.currentStartingPlayerInformation = getStartingPlayerInformation(lobby, players);
-        }
-        if (!lobby.currentRolePicker) {
-            lobby.currentRolePicker = getRolePickerUserId(lobby, players);
-        }
-
-        if (lobby.type === 'online') {
-            lobby.game = new OnlineGame(players.map(({ displayName }) => ({ name: displayName })), lobby.currentStartingPlayerInformation.index, lobby.settings);
-        } else {
-            lobby.game = new Game(players.map(({ displayName }) => ({ name: displayName })), lobby.currentStartingPlayerInformation.index, lobby.settings);
-        }
-        lobby.lastGunSlots = null;
-        lobby.playerCollection.clearPlayerIds();
-        for (let i = 0; i < players.length; i++) {
-            const currentPlayer = players[i];
-            lobby.playerCollection.updatePlayerIdByUserId(currentPlayer.userId, i);
-            if (currentPlayer.userId === lobby.currentRolePicker) {
-                sendRolePick(lobby.game, currentPlayer);
-            } else {
-                sendRoleSetup(currentPlayer);
-            }
-        }
-    }
-
-    function getStartingPlayerInformation(lobby, players) {
-        const possibleStartingPlayers = [];
-        for (let i = 0; i < players.length; i++) {
-            const currentPlayer = players[i];
-            if (!lobby.previousStartingPlayers.includes(currentPlayer.userId)) {
-                possibleStartingPlayers.push({index: i, userId: currentPlayer.userId});
-            }
-        }
-
-        if (possibleStartingPlayers.length === 0) {
-            lobby.previousStartingPlayers = [];
-            for (let i = 0; i < players.length; i++) {
-                possibleStartingPlayers.push({index: i, userId: players[i].userId});
-            }
-        }
-
-        return choice(possibleStartingPlayers);
-    }
-
-    function getRolePickerUserId(lobby, players) {
-        const possibleRolePickers = [];
-        for (let player of players) {
-            if (!lobby.previousRolePickers.includes(player.userId)) {
-                possibleRolePickers.push(player.userId);
-            }
-        }
-
-        if (possibleRolePickers.length === 0) {
-            lobby.previousRolePickers = [];
-            Array.prototype.push.apply(possibleRolePickers, players.map(player => player.userId));
-        }
-
-        return choice(possibleRolePickers);
-    }
-
-    function handleRolePick(lobby, rolePickInformation) {
-        const game = lobby.game;
-        game.assignRoles(rolePickInformation);
-
-        const players = lobby.playerCollection.getPlayers();
-        for (var i = 0; i < players.length; i++) {
-            const currentPlayer = players[i];
-            sendRoleAssign(game, currentPlayer);
-        }
-
-        if (game.isOnlineGame()) {
-            sendMissionResultsInformation(game, lobby.code);
-            handleStartProposal(lobby);
-        } else {
-            sendGameSetup(game, lobby.playerCollection.getPlayerOfPlayerId(0));
-        }
-    }
-
-    function sendRolePick(game, receiver) {
-        io.sockets.to(receiver.socketId).emit('role:pick', game.getPossibleRoles());
-    }
-
-    function sendGameSetup(game, receiver) {
-        io.sockets.to(receiver.socketId).emit('game:setup', game.getCurrentLeader().name);
-    }
-
-    function sendRoleSetup(receiver) {
-        io.sockets.to(receiver.socketId).emit('role:setup');
-    }
-
-    function sendRoleAssign(game, receiver) {
-        io.sockets.to(receiver.socketId).emit('role:assign', game.getRoleInformation(receiver.id));
-    }
+    }, 600000);
 
     function sendStatusMessage(message, receiver) {
         io.sockets.to(receiver).emit('update-status', message);
@@ -238,15 +141,9 @@ function attachServerSocket(httpServer) {
         //io.sockets.to(receiver.socketId).emit('mission:conduct', game.getConductMissionInformation(receiver.id));
     }
 
-    
-
-    
-
     function startConductRedemption(lobby) {
         lobby.startConductAssassination(handleResponseCallback(sendConductRedemption));
     }
-
-    
 
     io.on('connection', socket => {
         const code = socket.handshake.query.code;
@@ -262,10 +159,9 @@ function attachServerSocket(httpServer) {
 
             socket.on('lobby:close', () => {
                 lobby.updateLastUpdatedTime();
-                closeLobby();
+                closeLobby(code);
             });
         } else {
-            console.log("Game not found!");
             socket.disconnect()
         }
     });

@@ -26,7 +26,7 @@ router.get('/', authenticate, function (req, res) {
         }
     } else {
         res.status(404).json({
-            error: "Game Not Found!"
+            error: `Game "${code}" not found!`
         });
     }
 });
@@ -35,17 +35,17 @@ router.post('/', authenticate, function (req, res) {
     const authorization = parseAuthorization(req.headers);
     const type = req.body.type;
     const settings = {
-        ector: req.body.ector === "on",
-        kay: req.body.kay === "on",
-        titania: req.body.titania === "on",
-        accolon: req.body.accolon === "on",
-        bors: req.body.bors === "on",
-        lamorak: req.body.lamorak === "on",
-        gaheris: type === 'online' && req.body.resistancebind === "on",
-        geraint: type === 'online' && req.body.spybind === "on",
-        cynric: type === 'online' && req.body.resistancebind === "on",
-        cerdic: type === 'online' && req.body.spybind === "on",
-        sirrobin: type === 'online' && req.body.sirrobin === "on"
+        ector: req.body.ector,
+        kay: req.body.kay,
+        titania: req.body.titania,
+        accolon: req.body.accolon,
+        bors: req.body.bors,
+        lamorak: req.body.lamorak,
+        gaheris: type === 'online' && req.body.resistancebind,
+        geraint: type === 'online' && req.body.spybind,
+        cynric: type === 'online' && req.body.resistancebind,
+        cerdic: type === 'online' && req.body.spybind,
+        sirrobin: type === 'online' && req.body.sirrobin
     };
     const code = lobbyManager.create(Number(authorization.userId), type, settings);
     res.json({

@@ -32,7 +32,7 @@ export default function RolePick({possibleResistanceRoles, possibleSpyRoles, han
             <>
                 <FutureTitle text="Congratulations, you may select your role/team for this game!" />
                 <select onChange={handleSelectOnChange}>
-                    <option value="none" disabled/>
+                    <option value="none" selected disabled/>
                     <option value="Resistance">Resistance</option>
                     {possibleResistanceRoles.map((role, roleIndex) => {
                         return <option key={roleIndex} value={role}>(Resistance) {role}</option>

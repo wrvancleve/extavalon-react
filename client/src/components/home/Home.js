@@ -1,13 +1,15 @@
 import React, {useState} from 'react';
-import { useLocation, useNavigate, createSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams, createSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 
+import FutureHeader from '../common/futureHeader/FutureHeader';
 import FutureButton from '../common/futureButton/FutureButton';
 import FutureInputButton from '../common/futureInputButton/FutureInputButton';
 import FutureTextInput from '../common/futureTextInput/FutureTextInput';
 import FutureTitleBoxed from '../common/futureTitleBoxed/FutureTitleBoxed';
 import FutureSettingRow from '../common/futureSettingRow/FutureSettingRow';
+import Error from './error/Error';
 
 export default function Home() {
     const dispatch = useDispatch();
@@ -20,8 +22,7 @@ export default function Home() {
     const [searchParams] = useSearchParams();
     const [currenMenuName, setCurrentMenuName] = useState(searchParams.get('menu'));
 
-    const [errors, setErrors] = useState(location.state.errors);
-    console.log(errors);
+    const [errors, setErrors] = useState(location?.state?.errors);
 
     const [enteredGameCode, setEnteredGameCode] = useState("");
 
@@ -63,6 +64,9 @@ export default function Home() {
     }
 
     function handleBackButtonClick(previousMenu) {
+        if (errors) {
+            setErrors(null);
+        }
         setCurrentMenuName(previousMenu);
     }
 
@@ -148,7 +152,7 @@ export default function Home() {
         const authorization = "Basic " + btoa(userToken.firstName+":"+userToken.lastName+":"+userToken.userId);
         axios.request({
             method: "post",
-            url: "http://localhost:5000/game",
+            url: "http://localhost:5000/api/game",
             headers: {
                 "Content-Type": "application/json",
                 "Authorization": authorization
@@ -156,7 +160,6 @@ export default function Home() {
             data: JSON.stringify(gameSettings)
         }).then(response => {
             if (response.data.code) {
-                console.log(`Found code: ${response.data.code}`);
                 navigate({
                     pathname: "/game",
                     search: createSearchParams({code: response.data.code}).toString()
@@ -178,7 +181,7 @@ export default function Home() {
         const authorization = "Basic " + btoa(userToken.firstName+":"+userToken.lastName+":"+userToken.userId);
         axios.request({
             method: "post",
-            url: "http://localhost:5000/game",
+            url: "http://localhost:5000/api/game",
             headers: {
                 "Content-Type": "application/json",
                 "Authorization": authorization
@@ -251,6 +254,9 @@ export default function Home() {
             return (
                 <>
                     <FutureTitleBoxed />
+                    {errors &&
+                        <Error errors={errors} />
+                    }
                     <div className="FlexColumn">
                         <form className="FutureForm" onSubmit={handleJoinGameSubmit}>
                             <FutureTextInput onChange={handleGameCodeChange} placeholder="Enter Game Code" maxLength="4" required={true} text={enteredGameCode} />
@@ -261,12 +267,14 @@ export default function Home() {
                 </>
             );
         default:
+            /*
+                        <FutureButton onClick={handleProfileButtonClick} disabled={false} text="Profile" />
+                        <FutureButton onClick={handleStatsButtonClick} disabled={false} text="Stats" />
+            */
             return (
                 <>
                     <FutureTitleBoxed />
                     <div className="FlexColumn">
-                        <FutureButton onClick={handleProfileButtonClick} disabled={false} text="Profile" />
-                        <FutureButton onClick={handleStatsButtonClick} disabled={false} text="Stats" />
                         <FutureButton onClick={handleNewGameButtonClick} disabled={false} text="New Game" />
                         <FutureButton onClick={handleJoinGameButtonClick} disabled={false} text="Join Game" />
                         <FutureButton onClick={handleSignOutButtonClick} disabled={false} text="Sign Out" />

@@ -20,7 +20,7 @@ function sanitizeNameString(name) {
     return name.replace(/\w\S*/g, function (txt) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); });
 }
 
-let id = 1;
+//let id = 1;
 
 router.post('/', function (req, res) {
     check('firstName', 'Invalid First Name').trim().matches("^[ a-zA-z0-9]{2,16}$");
@@ -32,7 +32,6 @@ router.post('/', function (req, res) {
     } else {
         const firstName = sanitizeNameString(req.body.firstName);
         const lastName = sanitizeNameString(req.body.lastName);
-        /*
         getPlayerId(firstName, lastName, (err, result) => {
             if (err) {
                 res.redirect(`/login`);
@@ -44,7 +43,8 @@ router.post('/', function (req, res) {
                 });
             }
         });
-        */
+
+        /*
         const userId = id;
         id += 1;
      
@@ -53,6 +53,7 @@ router.post('/', function (req, res) {
             lastName: lastName,
             userId: userId
         });
+        */
     }
 });
 

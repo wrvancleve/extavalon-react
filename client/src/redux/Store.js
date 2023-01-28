@@ -9,11 +9,14 @@ const reducer = combineReducers({
 
 const sagaMiddleware = createSagaMiddleware();
 
+const storedFirstName = localStorage.getItem('firstName');
+const storedLastName = localStorage.getItem('lastName');
+const storedUserId = localStorage.getItem('userId');
 const preloadedState = {
     userToken: {
-        firstName: localStorage.getItem('firstName') || undefined,
-        lastName: localStorage.getItem('lastName') || undefined,
-        userId: localStorage.getItem('userId') || undefined
+        firstName: storedFirstName || undefined,
+        lastName: storedLastName || undefined,
+        userId: storedUserId != null ? Number(storedUserId) : undefined
     }
 };
 

@@ -37,7 +37,7 @@ export default function ConductRedemption({conductRedemptionInformation, handleC
             <div id="RedemptionPlayersContainer">
                 <div id="RedemptionPlayersListGroup" className="ListGroup">
                     {players.map((player) => {
-                        return <SimplePlayerListGroupItem key={player.id} player={player} selected={playerSelections.includes(player.id)} onClick={handlePlayerClick} />
+                        return <SimplePlayerListGroupItem key={player.id} player={player} selected={playerSelections.includes(player.id)} handlePlayerClick={handlePlayerClick} />
                     })}              
                 </div>
             </div>

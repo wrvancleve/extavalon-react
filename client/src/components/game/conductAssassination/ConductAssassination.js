@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 
 import FutureButton from '../../common/futureButton/FutureButton';
 import FutureHeader from '../../common/futureHeader/FutureHeader';
@@ -8,26 +8,26 @@ export default function ConductAssassination({ectorEnabled, conductAssassination
     const [submitDisabled, setSubmitDisabled] = useState(true);
     const [playerSelections, setPlayerSelections] = useState([]);
     const [assassinationRole, setAssassinationRole] = useState("none");
+    const requiredPlayerCountRef = useRef(1);
 
     const players = conductAssassinationInformation.players;
-    let requiredPlayerCount = 1;
 
     useEffect(() => {
-        setSubmitDisabled(playerSelections.length !== requiredPlayerCount || assassinationRole === "none");
+        setSubmitDisabled(playerSelections.length !== requiredPlayerCountRef.current || assassinationRole === "none");
     }, [playerSelections, assassinationRole]);
 
     function handlePlayerClick(playerId) {
         const playerIndex = playerSelections.indexOf(playerId);
         if (playerIndex !== -1) {
             setPlayerSelections([...playerSelections.slice(0, playerIndex), ...playerSelections.slice(playerIndex+1, playerSelections.length)]);
-        } else if (playerSelections.length !== requiredPlayerCount) {
+        } else if (playerSelections.length !== requiredPlayerCountRef.current) {
             setPlayerSelections([...playerSelections, playerId]);
         }
     }
 
     function handleRoleChange(e) {
         const newAssassinationRole = e.target.value;
-        requiredPlayerCount = newAssassinationRole === "Lovers" ? 2 : 1;
+        requiredPlayerCountRef.current = newAssassinationRole === "Lovers" ? 2 : 1;
         setAssassinationRole(newAssassinationRole);
     }
 
@@ -45,7 +45,7 @@ export default function ConductAssassination({ectorEnabled, conductAssassination
             <div id="AssassinationRoleContainer" className="CenterFlexRow">
                 <label for="AssassinationRoleSelect">Role:</label>
                 <select id="AssassinationRoleSelect" onChange={handleRoleChange}>
-                    <option value="none" disabled/>
+                    <option value="none" selected disabled/>
                     <option value="Merlin">Merlin</option>
                     <option value="Arthur">Arthur</option>
                     <option value="Lovers">Tristan & Iseult</option>
@@ -57,7 +57,7 @@ export default function ConductAssassination({ectorEnabled, conductAssassination
             <div id="AssassinationPlayersContainer">
                 <div id="AssassinationPlayersListGroup" className="ListGroup">
                     {players.map((player) => {
-                        return <SimplePlayerListGroupItem key={player.id} player={player} selected={playerSelections.includes(player.id)} onClick={handlePlayerClick} />
+                        return <SimplePlayerListGroupItem key={player.id} player={player} selected={playerSelections.includes(player.id)} handlePlayerClick={handlePlayerClick} />
                     })}              
                 </div>
             </div>
