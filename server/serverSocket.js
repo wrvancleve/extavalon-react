@@ -2,6 +2,7 @@ const lobbyManager = require('./models/lobbyManager');
 
 function attachServerSocket(httpServer) {
     const io = require('socket.io')(httpServer, {
+        path: '/api/socket.io',
         cors: {
             origin: "http://localhost:80",
             methods: ["GET", "POST"]
