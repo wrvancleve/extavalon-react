@@ -124,7 +124,7 @@ export default function Game() {
         const authorization = "Basic " + btoa(userToken.firstName+":"+userToken.lastName+":"+userToken.userId);
         axios.request({
             method: "get",
-            url: `${ROOT_URL}/api/game`,
+            url: `/api/game`,
             headers: {
                 "Content-Type": "application/json",
                 "Authorization": authorization

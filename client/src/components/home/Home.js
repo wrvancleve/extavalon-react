@@ -11,9 +11,6 @@ import FutureTitleBoxed from '../common/futureTitleBoxed/FutureTitleBoxed';
 import FutureSettingRow from '../common/futureSettingRow/FutureSettingRow';
 import Error from './error/Error';
 
-//const ROOT_URL = "http://localhost:5000";
-const ROOT_URL = "https://www.extavalon.com";
-
 export default function Home() {
     const dispatch = useDispatch();
     let location = useLocation();
@@ -155,7 +152,7 @@ export default function Home() {
         const authorization = "Basic " + btoa(userToken.firstName+":"+userToken.lastName+":"+userToken.userId);
         axios.request({
             method: "post",
-            url: `${ROOT_URL}/api/game`,
+            url: `/api/game`,
             headers: {
                 "Content-Type": "application/json",
                 "Authorization": authorization
@@ -184,7 +181,7 @@ export default function Home() {
         const authorization = "Basic " + btoa(userToken.firstName+":"+userToken.lastName+":"+userToken.userId);
         axios.request({
             method: "post",
-            url: `${ROOT_URL}/api/game`,
+            url: `/api/game`,
             headers: {
                 "Content-Type": "application/json",
                 "Authorization": authorization
