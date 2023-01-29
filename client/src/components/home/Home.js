@@ -12,7 +12,7 @@ import FutureSettingRow from '../common/futureSettingRow/FutureSettingRow';
 import Error from './error/Error';
 
 //const ROOT_URL = "http://localhost:5000";
-const ROOT_URL = "https://www.extavalon.com:5000";
+const ROOT_URL = "https://www.extavalon.com";
 
 export default function Home() {
     const dispatch = useDispatch();

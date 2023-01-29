@@ -21,7 +21,7 @@ import RolePick from './rolePick/RolePick';
 import './game.scss';
 
 //const ROOT_URL = "http://localhost:5000";
-const ROOT_URL = "https://www.extavalon.com:5000";
+const ROOT_URL = "https://www.extavalon.com";
 
 /*
 let location = useLocation();
