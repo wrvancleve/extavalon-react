@@ -138,7 +138,7 @@ export default function Game() {
             setGameType(response.data.type);
             setGameSettings(response.data.settings);
 
-            const socket = io.connect(`${ROOT_URL}?code=${gameCode}&userId=${userToken.userId}&firstName=${userToken.firstName}&lastName=${userToken.lastName}`, {path: '/api/socket.io'});
+            const socket = io.connect(`?code=${gameCode}&userId=${userToken.userId}&firstName=${userToken.firstName}&lastName=${userToken.lastName}`, {path: '/api/socket.io'});
 
             socket.on('lobby:update-players', (lobbyPlayers) => {
                 setGamePlayers(lobbyPlayers);
