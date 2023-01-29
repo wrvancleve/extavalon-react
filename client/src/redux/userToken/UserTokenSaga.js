@@ -7,7 +7,7 @@ import { setUserToken } from './UserTokenSlice';
 const ROOT_URL = "https://www.extavalon.com";
 
 function requestGetUserToken(userInformation) {
-    return axios.post(`${ROOT_URL}/api/login`, userInformation);
+    return axios.post(`/api/login`, userInformation);
 }
 
 export function* handleGetUserToken(action) {
